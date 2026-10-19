@@ -21,8 +21,10 @@ const App = {
     Search.init();
     await Notes.init();
     PWA.init();
+    Settings.init();
 
-    await this.loadFeed();
+    // Auto-check for updates on launch
+    await this.loadFeed(true);
   },
 
   switchTab(name) {
@@ -32,14 +34,13 @@ const App = {
     });
   },
 
-  async loadFeed() {
+  async loadFeed(isAuto = false) {
     this.loadingEl.hidden = false;
     this.feedEl.innerHTML = '';
     this.emptyEl.hidden = true;
 
     try {
-      // Try to load real feed.json (works on GitHub Pages)
-      const res = await fetch('../data/feed.json?t=' + Date.now());
+      const res = await fetch('../data/feed.json?t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         this.allPosts = Array.isArray(data) ? data : (data.posts || []);
@@ -47,12 +48,20 @@ const App = {
         throw new Error('No feed');
       }
     } catch {
-      // Demo data for local testing
       this.allPosts = this.getDemoPosts();
     }
 
     this.loadingEl.hidden = true;
     this.renderFeed(this.allPosts);
+
+    if (!isAuto) {
+      this.toast('Лента обновлена');
+    }
+  },
+
+  async refreshFeed() {
+    this.toast('Обновляю…');
+    await this.loadFeed(false);
   },
 
   renderFeed(posts, highlightQuery = '') {
@@ -112,7 +121,6 @@ const App = {
       </div>
     `;
 
-    // Expand text
     const readMore = card.querySelector('.read-more');
     if (readMore) {
       readMore.addEventListener('click', () => {
@@ -123,7 +131,6 @@ const App = {
       });
     }
 
-    // Share post
     card.querySelector('.post-share').addEventListener('click', () => {
       PWA.share(post);
     });
