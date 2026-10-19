@@ -18,6 +18,10 @@
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --transition: 0.2s ease;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 /* ===== Reset & Base ===== */
@@ -39,6 +43,10 @@ body {
   line-height: 1.5;
   min-height: 100dvh;
   overflow-x: hidden;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
 }
 
 button, input, textarea {
@@ -63,7 +71,7 @@ img {
 .app {
   max-width: 680px;
   margin: 0 auto;
-  min-height: 100dvh;
+  min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
 }
@@ -76,6 +84,7 @@ img {
   background: rgba(15, 17, 23, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  padding-top: max(0px, var(--safe-top));
 }
 
 .header-content {
@@ -336,6 +345,7 @@ img {
 .main {
   flex: 1;
   padding: 16px;
+  padding-bottom: calc(16px + var(--safe-bottom));
 }
 
 .tab-content {
@@ -585,6 +595,7 @@ img {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  padding-bottom: var(--safe-bottom);
 }
 
 .modal[hidden] {
@@ -602,12 +613,13 @@ img {
   position: relative;
   width: 100%;
   max-width: 520px;
-  max-height: 90dvh;
+  max-height: calc(90dvh - var(--safe-bottom));
   background: var(--bg-elevated);
   border-radius: 16px 16px 0 0;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.25s ease;
+  padding-bottom: max(12px, var(--safe-bottom));
 }
 
 @keyframes slideUp {
@@ -618,10 +630,12 @@ img {
 @media (min-width: 600px) {
   .modal {
     align-items: center;
+    padding-bottom: 0;
   }
   .modal-content {
     border-radius: 16px;
     max-height: 80vh;
+    padding-bottom: 0;
   }
 }
 
@@ -682,6 +696,7 @@ img {
   justify-content: space-between;
   padding: 12px 20px 20px;
   gap: 12px;
+  padding-bottom: max(20px, calc(12px + var(--safe-bottom)));
 }
 
 .modal-actions {
@@ -693,7 +708,7 @@ img {
 /* ===== Toast ===== */
 .toast {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(24px + var(--safe-bottom));
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-elevated);
