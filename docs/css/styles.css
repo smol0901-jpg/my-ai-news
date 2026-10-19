@@ -587,6 +587,10 @@ img {
   justify-content: center;
 }
 
+.modal[hidden] {
+  display: none !important;
+}
+
 .modal-backdrop {
   position: absolute;
   inset: 0;
@@ -701,6 +705,10 @@ img {
   box-shadow: var(--shadow);
   z-index: 300;
   animation: toastIn 0.3s ease;
+}
+
+.toast[hidden] {
+  display: none !important;
 }
 
 @keyframes toastIn {
