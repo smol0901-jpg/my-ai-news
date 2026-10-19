@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-news-v1';
+const CACHE_NAME = 'ai-news-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './js/search.js',
   './js/notes.js',
   './js/pwa.js',
+  './js/settings.js',
   './manifest.json'
 ];
 
@@ -28,8 +29,8 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  
-  // Network-first for feed.json
+
+  // Always network-first for feed.json (fresh data)
   if (request.url.includes('feed.json')) {
     event.respondWith(
       fetch(request)
@@ -43,7 +44,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets
+  // Network-first for HTML and JS (so updates appear quickly)
+  if (request.destination === 'document' || request.url.endsWith('.js') || request.url.endsWith('.css')) {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          return res;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Cache-first for everything else
   event.respondWith(
     caches.match(request).then((cached) => cached || fetch(request))
   );
