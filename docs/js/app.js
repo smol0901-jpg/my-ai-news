@@ -40,14 +40,16 @@ const App = {
     this.emptyEl.hidden = true;
 
     try {
-      const res = await fetch('../data/feed.json?t=' + Date.now(), { cache: 'no-store' });
+      // On GitHub Pages /docs is the site root, so data lives at ./data/feed.json
+      const res = await fetch('./data/feed.json?t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         this.allPosts = Array.isArray(data) ? data : (data.posts || []);
       } else {
         throw new Error('No feed');
       }
-    } catch {
+    } catch (e) {
+      console.warn('Feed load failed, using demo', e);
       this.allPosts = this.getDemoPosts();
     }
 
@@ -80,7 +82,7 @@ const App = {
 
     const date = post.date || post.createdAt || '';
     const title = Search.highlight(post.title || 'Без названия', query);
-    let text = post.text || post.content || post.lead || '';
+    let text = post.text || post.content || post.excerpt || post.lead || '';
     const fullText = text;
     const isLong = text.length > 320;
     if (isLong) text = text.slice(0, 320) + '…';
